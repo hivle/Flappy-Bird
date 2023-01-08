@@ -1,7 +1,7 @@
 function Bird() {
     this.y = height/2 - 30;
     this.x = 100;
-    this.gravity = 0.8;
+    this.gravity = 0.7;
     this.velocity = 0;
     this.turn = 0;
     this.turnup = false;
@@ -14,7 +14,6 @@ function Bird() {
         translate(this.x, this.y);
         this.ani += 1;
         rotate(this.turn);
-        //rect(0,0,36,26);
         if(cont === false){
             this.ani = -1;
         }
@@ -42,7 +41,7 @@ function Bird() {
             
         }
         else {
-            this.turn += PI/45;
+            this.turn += PI/90;
             if (this.turn > PI/2) {
                 this.turn = PI/2;
             }
@@ -77,6 +76,5 @@ function Bird() {
             this.velocity = 0;
         }
     }
-
 
 }
