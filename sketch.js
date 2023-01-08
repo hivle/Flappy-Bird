@@ -81,7 +81,7 @@ function draw() {
   bird.show();
 
   // New Pipe every 120 frames
-  if (frameCount % 120 === 0) {
+  if (frameCount % 120 === 0 && !start) {
     pipes.push(new Pipe());
   }
 
