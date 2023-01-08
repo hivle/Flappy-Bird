@@ -1,36 +1,35 @@
 function Bird() {
     this.y = height/2 - 30;
     this.x = 100;
-    this.gravity = 0.7;
+    this.gravity = 0.5;
     this.velocity = 0;
     this.turn = 0;
     this.turnup = false;
     this.ani = 0;
 
     this.show = function (){
-        fill(255);
         rectMode(CENTER);
         imageMode(CENTER);
         translate(this.x, this.y);
         this.ani += 1;
+        if (start) this.turn = 0; 
         rotate(this.turn);
         if(cont === false){
             this.ani = -1;
         }
-        if (this.ani <= 5){
+        if (this.ani <= 4){
             image(bird1,0,0);
             this.ani += 1;
         }
-        else if (this.ani  <= 10){
+        else if (this.ani  <= 8){
             image(bird2,0,0);
             this.ani += 1;
         }
-        else if (this.ani <= 15){
+        else if (this.ani <= 12){
             image(bird3,0,0);
-            if (this.ani === 15){
+            if (this.ani === 12){
                 this.ani = 0;
             }
-
         }
 
         if (this.turnup) {
@@ -53,12 +52,11 @@ function Bird() {
 
     this.up = function() {
         if(cont){
-            this.velocity = -12;
+            this.velocity = -8;
             this.turnup = true;
         }
-
-        
     }
+
     this.update = function () {
         this.velocity += this.gravity;
         this.y += this.velocity;
