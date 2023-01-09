@@ -19,7 +19,7 @@ function Pipe(){
     }
 
     this.pass = function(bird) {
-        return (bird.x == this.x + this.w)
+        return (bird.x == this.x + this.w);
     }
 
     this.show = function() {
