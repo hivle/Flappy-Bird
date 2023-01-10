@@ -5,73 +5,58 @@ function Bird() {
     this.velocity = 0;
     this.turn = 0;
     this.turnup = false;
-    this.ani = 0;
+    this.birds = new Sprite(animation, 0, 0, 0.4);
+    this.dead = false;
+    this.start = true;
+    
 
     this.show = function (){
-        rectMode(CENTER);
         imageMode(CENTER);
         translate(this.x, this.y);
-        this.ani += 1;
-        if (start) this.turn = 0; 
-        rotate(this.turn);
-        if(cont === false){
-            this.ani = -1;
-        }
-        if (this.ani <= 4){
-            image(bird1,0,0);
-            this.ani += 1;
-        }
-        else if (this.ani  <= 8){
-            image(bird2,0,0);
-            this.ani += 1;
-        }
-        else if (this.ani <= 12){
-            image(bird3,0,0);
-            if (this.ani === 12){
-                this.ani = 0;
-            }
-        }
-
-        if (this.turnup) {
-            this.turn -= PI/180 * 12;
-            if (this.turn < -PI/180 * 40) {
-                this.turnup = false;
-            }
-            
+        if (this.start) {
+            this.birds.move(0, 0);
+            this.birds.show();
+            if (!this.dead) this.birds.animate();
         }
         else {
-            this.turn += PI/90;
-            if (this.turn > PI/2) {
-                this.turn = PI/2;
+            rotate(this.turn);
+            this.birds.move(0, 0);
+            this.birds.show();
+            if (!this.dead) this.birds.animate();
+            if (this.turnup) {
+                this.turn -= PI/180 * 12;
+                if (this.turn < -PI/180 * 40) {
+                    this.turnup = false;
+                }
+                
+            }
+            else {
+                if(bird.dead) {
+                    this.turn += PI/30;
+                }
+                else this.turn += PI/90;
+                if (this.turn > PI/2) {
+                    this.turn = PI/2;
+                }
+
             }
         }
-        rectMode(CORNER);
         imageMode(CORNER);
     }
 
 
     this.up = function() {
-        if(cont){
+        if (!this.dead){
             this.velocity = -8;
             this.turnup = true;
         }
     }
 
     this.update = function () {
-        this.velocity += this.gravity;
-        this.y += this.velocity;
-
-        if (bird.y > height - 113) {
-            this.y = height - 113;
-            this.velocity = 0;
-        }
-        if (this.y === height - 113){
-            cont = false;
-            ground_speed = 0;
-        }
-        if (bird.y < -100) {
-            this.y = -100;
-            this.velocity = 0;
+        if (!this.start) this.velocity += this.gravity;
+        this.y = constrain(this.y + this.velocity, -100, height - 113);
+        if (this.y == height - 113){
+            this.dead = true;
         }
     }
 
