@@ -6,7 +6,6 @@ var tube2;
 var ground;
 var ground_movement = 0;
 var score = 0;
-var back = 0
 let spritesheet;
 let spritedata;
 let animation = [];
@@ -21,13 +20,11 @@ function preload() {
   spritesheet = loadImage('images/bird.png');
   tube1 = loadImage("images/tube1.png");
   tube2 = loadImage("images/tube2.png");
-  pipe.push(new Pipe());
 }
 
 function restart() {
   bird = new Bird();
   pipes = [];
-  pipe.push(new Pipe());
   score = 0;
 }
 
@@ -46,20 +43,8 @@ function setup() {
 }
 
 function draw() {
-  if (back == -width) {
-    back = 0;
-  }
-  if (ground_movement == -width) {
-    ground_movement = 0;
-  }
-  image(bg,back+width,0);
-  image(bg,back,0);
-  image(bg,back+width,60);
-  image(bg,back,60);
-  if (!bird.dead) {
-    ground_movement -= 2;
-    back -=0.25;
-  }
+  image(bg,0,0);
+  image(bg,0,60);
 
   // Draw pipes
   for (let pipe of pipes){
@@ -78,6 +63,12 @@ function draw() {
   text(score, 203-score.toString().length * 10, 103);
   fill(255);
   text(score, 200-score.toString().length * 10, 100);
+  if (ground_movement == -width) {
+    ground_movement = 0;
+  }
+  if (!bird.dead) {
+    ground_movement -= 2;
+  }
   image(ground,ground_movement+width,500);
   image(ground,ground_movement,500);
 
