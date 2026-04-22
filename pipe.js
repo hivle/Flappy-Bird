@@ -4,6 +4,7 @@ function Pipe(){
     this.x = width;
     this.w = tube1.width;
     this.speed = 2;
+    this.passed = false;
 
     this.hits = function(bird) {
         if (bird.y < this.top + 13 || bird.y > height - this.bottom - 13) {
@@ -15,7 +16,11 @@ function Pipe(){
     }
 
     this.pass = function(bird) {
-        return (bird.x == this.x + this.w);
+        if (!this.passed && bird.x >= this.x + this.w) {
+            this.passed = true;
+            return true;
+        }
+        return false;
     }
 
     this.show = function() {
