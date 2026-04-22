@@ -1,21 +1,22 @@
-function Pipe(){
-    this.top = random(30,height-300);
-    this.bottom = height - this.top - 150;
-    this.x = width;
-    this.w = tube1.width;
-    this.speed = 2;
-    this.passed = false;
+class Pipe {
+    constructor(game) {
+        this.game = game;
+        this.top = 30 + Math.random() * (game.height - 330);
+        this.bottom = game.height - this.top - 150;
+        this.x = game.width;
+        this.w = game.tube1.width;
+        this.speed = 2;
+        this.passed = false;
+    }
 
-    this.hits = function(bird) {
-        if (bird.y < this.top + 13 || bird.y > height - this.bottom - 13) {
-            if (bird.x > this.x - 13 && bird.x < this.x + this.w) {
-                return true;
-            }
+    hits(bird) {
+        if (bird.y < this.top + 13 || bird.y > this.game.height - this.bottom - 13) {
+            if (bird.x > this.x - 13 && bird.x < this.x + this.w) return true;
         }
         return false;
     }
 
-    this.pass = function(bird) {
+    pass(bird) {
         if (!this.passed && bird.x >= this.x + this.w) {
             this.passed = true;
             return true;
@@ -23,15 +24,16 @@ function Pipe(){
         return false;
     }
 
-    this.show = function() {
-       image(tube1,this.x,this.top - 320);
-       image(tube2,this.x,height - this.bottom);
+    show(ctx) {
+        ctx.drawImage(this.game.tube1, this.x, this.top - 320);
+        ctx.drawImage(this.game.tube2, this.x, this.game.height - this.bottom);
     }
-    this.update = function() {
+
+    update() {
         this.x -= this.speed;
     }
 
-    this.offscreen = function() {
-        return (this.x < -this.w);
+    offscreen() {
+        return this.x < -this.w;
     }
 }
