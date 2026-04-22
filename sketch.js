@@ -47,14 +47,15 @@ function draw() {
   image(bg,0,60);
 
   // Draw pipes
-  for (let pipe of pipes){
-    if (pipe.offscreen()) pipes.slice(1);
+  for (let i = pipes.length - 1; i >= 0; i--) {
+    let pipe = pipes[i];
     if (pipe.hits(bird)) {
       bird.dead = true;
     }
     else if (pipe.pass(bird)) score++;
     pipe.show();
     if (!bird.dead) pipe.update();
+    if (pipe.offscreen()) pipes.splice(i, 1);
   }
 
 
@@ -83,8 +84,8 @@ function draw() {
 }
 
 function keyPressed() {
-  bird.start = false;
   if (key === ' '){
+    bird.start = false;
     if (!bird.dead) bird.up();
     else restart();
   }

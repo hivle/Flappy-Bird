@@ -31,7 +31,7 @@ function Bird() {
                 
             }
             else {
-                if(bird.dead) {
+                if(this.dead) {
                     this.turn += PI/30;
                 }
                 else this.turn += PI/90;
