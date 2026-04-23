@@ -135,11 +135,11 @@ function restart() {
     setState(STATE.MENU);
 }
 
-function drawBackground() {
-    ctx.drawImage(game.bg, 0, 0);
-}
+const SIM_STEP = 1000 / 60;
+let lastTime = 0;
+let accumulator = 0;
 
-function drawPipes() {
+function updatePipes() {
     const active = game.state === STATE.PLAYING;
     for (let i = game.pipes.length - 1; i >= 0; i--) {
         const pipe = game.pipes[i];
@@ -150,18 +150,50 @@ function drawPipes() {
             } else if (pipe.pass(game.bird)) {
                 game.score++;
             }
+            pipe.update();
         }
-        pipe.show(ctx);
-        if (active) pipe.update();
         if (pipe.offscreen()) game.pipes.splice(i, 1);
     }
 }
 
-function drawGround() {
-    if (game.state === STATE.PLAYING) {
-        game.groundMovement -= 2;
-        if (game.groundMovement <= -game.width) game.groundMovement = 0;
+function updateGround() {
+    if (game.state !== STATE.PLAYING) return;
+    game.groundMovement -= 2;
+    if (game.groundMovement <= -game.width) game.groundMovement = 0;
+}
+
+function updateBird() {
+    if (game.state !== STATE.PLAYING && game.state !== STATE.GAMEOVER) return;
+    game.bird.update();
+    if (game.bird.dead && game.state !== STATE.GAMEOVER) {
+        setState(STATE.GAMEOVER);
     }
+}
+
+function maybeSpawnPipe() {
+    if (game.state !== STATE.PLAYING) return;
+    game.frames++;
+    if (game.frames % 120 === 0) game.pipes.push(new Pipe(game));
+}
+
+function step() {
+    updatePipes();
+    updateGround();
+    updateBird();
+    maybeSpawnPipe();
+}
+
+function drawBackground() {
+    ctx.drawImage(game.bg, 0, 0);
+}
+
+function drawPipes() {
+    for (let i = 0; i < game.pipes.length; i++) {
+        game.pipes[i].show(ctx);
+    }
+}
+
+function drawGround() {
     ctx.drawImage(game.ground, game.groundMovement + game.width, 500);
     ctx.drawImage(game.ground, game.groundMovement, 500);
 }
@@ -179,32 +211,28 @@ function drawScore() {
 }
 
 function drawBird() {
-    if (game.state === STATE.PLAYING || game.state === STATE.GAMEOVER) {
-        game.bird.update();
-        if (game.bird.dead && game.state !== STATE.GAMEOVER) {
-            setState(STATE.GAMEOVER);
-        }
-    }
     game.bird.show(ctx);
 }
 
-function maybeSpawnPipe() {
-    if (game.state !== STATE.PLAYING) return;
-    game.frames++;
-    if (game.frames % 120 === 0) game.pipes.push(new Pipe(game));
-}
-
-function draw() {
+function render() {
     drawBackground();
     drawPipes();
     drawScore();
     drawGround();
     drawBird();
-    maybeSpawnPipe();
 }
 
-function loop() {
-    draw();
+function loop(now) {
+    if (!lastTime) lastTime = now;
+    let delta = now - lastTime;
+    lastTime = now;
+    if (delta > 250) delta = 250;
+    accumulator += delta;
+    while (accumulator >= SIM_STEP) {
+        step();
+        accumulator -= SIM_STEP;
+    }
+    render();
     requestAnimationFrame(loop);
 }
 
@@ -246,7 +274,7 @@ preload().then(() => {
     resetGame();
     bindInput();
     setState(STATE.MENU);
-    loop();
+    requestAnimationFrame(loop);
 }).catch(err => {
     console.error('Failed to load assets', err);
     ui.title.textContent = 'Error';
