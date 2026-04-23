@@ -1,3 +1,121 @@
+class Sprite {
+    constructor(frames, x, y, speed) {
+        this.x = x;
+        this.y = y;
+        this.frames = frames;
+        this.len = frames.length;
+        this.speed = speed;
+        this.index = 0;
+    }
+
+    show(ctx) {
+        const f = this.frames[Math.floor(this.index) % this.len];
+        ctx.drawImage(
+            f.img, f.sx, f.sy, f.sw, f.sh,
+            this.x - f.sw / 2, this.y - f.sh / 2, f.sw, f.sh
+        );
+    }
+
+    animate() {
+        this.index += this.speed;
+    }
+
+    move(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+}
+
+class Bird {
+    constructor(game) {
+        this.game = game;
+        this.y = game.height / 2 - 30;
+        this.x = 100;
+        this.gravity = 0.5;
+        this.velocity = 0;
+        this.turn = 0;
+        this.turnup = false;
+        this.sprite = new Sprite(game.birdFrames, 0, 0, 0.4);
+        this.dead = false;
+        this.start = true;
+    }
+
+    show(ctx) {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        if (this.start) {
+            this.sprite.show(ctx);
+            if (!this.dead) this.sprite.animate();
+        } else {
+            ctx.rotate(this.turn);
+            this.sprite.show(ctx);
+            if (!this.dead) this.sprite.animate();
+            if (this.turnup) {
+                this.turn -= Math.PI / 180 * 12;
+                if (this.turn < -Math.PI / 180 * 40) this.turnup = false;
+            } else {
+                this.turn += this.dead ? Math.PI / 30 : Math.PI / 90;
+                if (this.turn > Math.PI / 2) this.turn = Math.PI / 2;
+            }
+        }
+        ctx.restore();
+    }
+
+    up() {
+        if (!this.dead) {
+            this.velocity = -8;
+            this.turnup = true;
+        }
+    }
+
+    update() {
+        if (!this.start) this.velocity += this.gravity;
+        const maxY = this.game.height - 113;
+        this.y = Math.max(-100, Math.min(maxY, this.y + this.velocity));
+        if (this.y === maxY) this.dead = true;
+    }
+}
+
+class Pipe {
+    constructor(game) {
+        this.game = game;
+        this.top = 30 + Math.random() * (game.height - 330);
+        this.bottom = game.height - this.top - 150;
+        this.x = game.width;
+        this.w = game.tube1.width;
+        this.speed = 2;
+        this.passed = false;
+    }
+
+    hits(bird) {
+        if (bird.y < this.top + 13 || bird.y > this.game.height - this.bottom - 13) {
+            if (bird.x > this.x - 13 && bird.x < this.x + this.w) return true;
+        }
+        return false;
+    }
+
+    pass(bird) {
+        if (!this.passed && bird.x >= this.x + this.w) {
+            this.passed = true;
+            return true;
+        }
+        return false;
+    }
+
+    show(ctx) {
+        ctx.drawImage(this.game.tube1, this.x, this.top - 320);
+        ctx.drawImage(this.game.tube2, this.x, this.game.height - this.bottom);
+    }
+
+    update() {
+        this.x -= this.speed;
+    }
+
+    offscreen() {
+        return this.x < -this.w;
+    }
+}
+
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
