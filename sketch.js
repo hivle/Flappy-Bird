@@ -1,4 +1,4 @@
-console.log('[flappy] build 2026-04-23 slow-anim-v2');
+console.log('[flappy] build 2026-04-23 slow-anim-v3');
 
 class Sprite {
     constructor(frames, x, y, speed) {
@@ -37,7 +37,7 @@ class Bird {
         this.velocity = 0;
         this.turn = 0;
         this.turnup = false;
-        this.sprite = new Sprite(game.birdFrames, 0, 0, 0.06);
+        this.sprite = new Sprite(game.birdFrames, 0, 0, 0.03);
         this.dead = false;
         this.start = true;
     }
@@ -65,10 +65,10 @@ class Bird {
         this.y = Math.max(-100, Math.min(maxY, this.y + this.velocity));
         if (this.y === maxY) this.dead = true;
         if (this.turnup) {
-            this.turn -= Math.PI / 180 * 3;
+            this.turn -= Math.PI / 180 * 2;
             if (this.turn < -Math.PI / 180 * 40) this.turnup = false;
         } else {
-            this.turn += this.dead ? Math.PI / 120 : Math.PI / 360;
+            this.turn += this.dead ? Math.PI / 240 : Math.PI / 720;
             if (this.turn > Math.PI / 2) this.turn = Math.PI / 2;
         }
     }
