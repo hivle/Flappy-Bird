@@ -35,7 +35,7 @@ class Bird {
         this.velocity = 0;
         this.turn = 0;
         this.turnup = false;
-        this.sprite = new Sprite(game.birdFrames, 0, 0, 0.4);
+        this.sprite = new Sprite(game.birdFrames, 0, 0, 0.15);
         this.dead = false;
         this.start = true;
     }
@@ -43,21 +43,8 @@ class Bird {
     show(ctx) {
         ctx.save();
         ctx.translate(this.x, this.y);
-        if (this.start) {
-            this.sprite.show(ctx);
-            if (!this.dead) this.sprite.animate();
-        } else {
-            ctx.rotate(this.turn);
-            this.sprite.show(ctx);
-            if (!this.dead) this.sprite.animate();
-            if (this.turnup) {
-                this.turn -= Math.PI / 180 * 12;
-                if (this.turn < -Math.PI / 180 * 40) this.turnup = false;
-            } else {
-                this.turn += this.dead ? Math.PI / 30 : Math.PI / 90;
-                if (this.turn > Math.PI / 2) this.turn = Math.PI / 2;
-            }
-        }
+        if (!this.start) ctx.rotate(this.turn);
+        this.sprite.show(ctx);
         ctx.restore();
     }
 
@@ -69,10 +56,19 @@ class Bird {
     }
 
     update() {
-        if (!this.start) this.velocity += this.gravity;
+        if (!this.dead) this.sprite.animate();
+        if (this.start) return;
+        this.velocity += this.gravity;
         const maxY = this.game.height - 113;
         this.y = Math.max(-100, Math.min(maxY, this.y + this.velocity));
         if (this.y === maxY) this.dead = true;
+        if (this.turnup) {
+            this.turn -= Math.PI / 180 * 6;
+            if (this.turn < -Math.PI / 180 * 40) this.turnup = false;
+        } else {
+            this.turn += this.dead ? Math.PI / 60 : Math.PI / 180;
+            if (this.turn > Math.PI / 2) this.turn = Math.PI / 2;
+        }
     }
 }
 
@@ -281,7 +277,7 @@ function updateGround() {
 }
 
 function updateBird() {
-    if (game.state !== STATE.PLAYING && game.state !== STATE.GAMEOVER) return;
+    if (game.state === STATE.PAUSED) return;
     game.bird.update();
     if (game.bird.dead && game.state !== STATE.GAMEOVER) {
         setState(STATE.GAMEOVER);
